@@ -9,7 +9,6 @@ export const SCENARIOS: Scenario[] = [
   {
     id: "banking",
     title: "Banking System",
-    language: "python",
     difficulty: "Medium",
     icon: <Database className="text-blue-400" />,
     summary: "Build a transactional ledger with fraud detection, analytics, and scheduled payments. (eBay/Capital One style)",
@@ -189,7 +188,6 @@ except Exception as e:
   {
     id: "filesystem",
     title: "In-Memory File System",
-    language: "python",
     difficulty: "Hard",
     icon: <Code2 className="text-green-400" />,
     summary: "Design a file storage system with quota management, backups, and file restoration. (Dropbox/Google Drive style)",
@@ -364,7 +362,6 @@ except Exception as e:
   {
     id: "library",
     title: "Digital Library",
-    language: "python",
     difficulty: "Easy",
     icon: <BookOpen className="text-purple-400" />,
     summary: "Manage book inventory, borrowing limits, and popularity tracking.",
