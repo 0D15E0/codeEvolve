@@ -207,29 +207,65 @@ export default function Simulator({ scenario, onBack }: SimulatorProps) {
         {/* Instructions Area */}
         <div className="p-6 flex-1 overflow-y-auto custom-scrollbar">
           <h2 className="text-xl font-bold mb-4 text-white">{activeLevel.title}</h2>
-          <ReactMarkdown
+        <div className="prose prose-invert prose-sm max-w-none text-gray-300">
+        <ReactMarkdown
             components={{
-              h1: ({children}) => <h1 className="text-lg font-bold my-3 text-white">{children}</h1>,
-              h2: ({children}) => <h2 className="text-base font-bold mt-4 mb-2 text-white border-b border-gray-700 pb-1">{children}</h2>,
-              p: ({children}) => <p className="mb-4 text-gray-300 leading-relaxed text-sm">{children}</p>,
-              ul: ({children}) => <ul className="list-disc pl-5 mb-4 text-gray-300 space-y-1">{children}</ul>,
-              li: ({children}) => <li className="text-sm text-gray-300">{children}</li>,
-              strong: ({children}) => <strong className="text-blue-300 font-semibold">{children}</strong>,
-              code: ({node, inline, className, children, ...props}: any) => {
-                return !inline ? (
-                  <div className="bg-black/40 rounded-md p-3 my-3 border border-gray-700 font-mono text-xs overflow-x-auto shadow-inner">
-                    <code className="text-green-300" {...props}>{children}</code>
-                  </div>
-                ) : (
-                  <code className="bg-gray-800 px-1.5 py-0.5 rounded text-blue-200 font-mono text-xs border border-gray-700" {...props}>
+            // --- TYPOGRAPHY ---
+            h1: ({children}) => <h1 className="text-xl font-bold mt-6 mb-3 text-white border-b border-gray-700 pb-2">{children}</h1>,
+            h2: ({children}) => <h2 className="text-lg font-semibold mt-5 mb-2 text-blue-400">{children}</h2>,
+            h3: ({children}) => <h3 className="text-base font-medium mt-4 mb-2 text-gray-200">{children}</h3>,
+            p: ({children}) => <p className="mb-3 leading-relaxed">{children}</p>,
+            ul: ({children}) => <ul className="list-disc pl-5 mb-3 space-y-1">{children}</ul>,
+            ol: ({children}) => <ol className="list-decimal pl-5 mb-3 space-y-1">{children}</ol>,
+            li: ({children}) => <li className="pl-1">{children}</li>,
+            
+            // --- CODE BLOCK LOGIC (The Fix) ---
+            code: ({node, inline, className, children, ...props}: any) => {
+                const match = /language-(\w+)/.exec(className || '');
+                const codeContent = String(children).replace(/\n$/, ''); // Remove trailing newline
+                const isMultiLine = codeContent.includes('\n');
+                
+                // SMART CHECK: 
+                // If it's explicitly inline OR it's a short, single-line snippet without a specific language,
+                // we render it as a "Badge" instead of a huge "Box".
+                const shouldRenderInline = inline || (!match && !isMultiLine && codeContent.length < 80);
+
+                if (shouldRenderInline) {
+                return (
+                    <code 
+                    className="bg-gray-800 text-blue-300 px-1.5 py-0.5 rounded text-[13px] font-mono border border-gray-700/50 align-middle whitespace-normal break-words" 
+                    {...props}
+                    >
                     {children}
-                  </code>
-                )
-              }
+                    </code>
+                );
+                }
+
+                // BLOCK RENDERER (Only for big code blocks)
+                return (
+                <div className="relative my-4 group rounded-lg overflow-hidden border border-gray-700 bg-[#1e1e1e]">
+                    {/* Only show language badge if we actually know the language */}
+                    {match && (
+                    <div className="absolute top-0 right-0 px-2 py-0.5 text-[10px] text-gray-500 bg-gray-900 border-l border-b border-gray-700 rounded-bl">
+                        {match[1]}
+                    </div>
+                    )}
+                    <div className="p-3 overflow-x-auto">
+                    <code 
+                        className="text-gray-300 font-mono text-sm block min-w-full leading-relaxed" 
+                        {...props}
+                    >
+                        {children}
+                    </code>
+                    </div>
+                </div>
+                );
+            }
             }}
-          >
+        >
             {activeLevel.description}
-          </ReactMarkdown>
+        </ReactMarkdown>
+        </div>
         </div>
 
         {/* Next Level Action */}
